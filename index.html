@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BOOK HUB — Book Reviews</title>
+  <style>
+    :root {
+      --ink: #27183b;
+      --muted: #766b88;
+      --paper: #fbf7ff;
+      --accent: #743fd1;
+      --line: #eee5f5;
+      --green: #168268;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background:
+        radial-gradient(ellipse at 8% 12%, #dfcaff 0, transparent 31%),
+        radial-gradient(ellipse at 94% 30%, #ffd2bd 0, transparent 29%),
+        radial-gradient(ellipse at 22% 92%, #cef2e5 0, transparent 32%),
+        linear-gradient(135deg, #f5eaff, #fff2e8 52%, #ebf9f4);
+      background-attachment: fixed;
+      color: var(--ink);
+      font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+
+    header {
+      background: linear-gradient(110deg, #51299a, #7540c6 58%, #984cc6);
+      box-shadow: 0 5px 22px #49257a30;
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    .bar {
+      max-width: 1160px;
+      margin: auto;
+      padding: 14px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .brand {
+      font-size: 21px;
+      font-weight: 850;
+      letter-spacing: .04em;
+      color: #fff;
+      margin-right: auto;
+      white-space: nowrap;
+    }
+
+    .brand span { color: #ffe28a; }
+
+    nav { display: flex; gap: 5px; }
+
+    button {
+      border: 0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, #7540d1, #a34cc7);
+      color: #fff;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 5px 13px #6938aa30;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    button:hover {
+      filter: brightness(1.06);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 18px #6938aa38;
+    }
+
+    button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 3px solid #ffbf5d;
+      outline-offset: 2px;
+    }
+
+    .quiet { background: #f2eaff; color: #6733b3; box-shadow: none; }
+    .quiet:hover { box-shadow: 0 6px 15px #6938aa20; }
+    .danger { background: #fff0ee; color: #b13d38; box-shadow: none; }
+    .navbtn { background: transparent; color: #f5eaff; box-shadow: none; }
+    .navbtn:hover { background: #ffffff24; box-shadow: none; }
+    .navbtn.active { background: #fff; color: #5e31a8; box-shadow: 0 4px 12px #32145d38; }
+    .navbtn.active:hover { background: #fff; }
+
+    main {
+      max-width: 1160px;
+      margin: 30px auto;
+      padding: 0 22px;
+    }
+
+    .welcome {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .welcome h1 { font-size: 28px; line-height: 1.2; margin: 0; }
+    .muted { color: var(--muted); }
+
+    .hero {
+      min-height: 210px;
+      padding: 30px 34px;
+      border-radius: 26px;
+      color: #fff;
+      background: linear-gradient(115deg, #6337bd 0%, #9849cf 62%, #e56f9e 100%);
+      box-shadow: 0 18px 40px #713ec433;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::after {
+      content: "✦";
+      position: absolute;
+      top: -50px;
+      right: 38px;
+      color: #ffffff35;
+      font-size: 210px;
+      line-height: 1;
+      transform: rotate(12deg);
+      pointer-events: none;
+    }
+
+    .hero > * { position: relative; z-index: 1; }
+    .hero h1 { max-width: 620px; font-size: clamp(32px, 4vw, 46px); letter-spacing: -.03em; }
+    .hero .muted { color: #f4eaff; font-size: 16px; margin-top: 9px; }
+    .hero-kicker { color: #ffe28a; font-size: 12px; font-weight: 800; letter-spacing: .13em; margin-bottom: 8px; }
+    .hero-actions { display: flex; align-items: center; gap: 10px; }
+    .hero .hero-cta { color: #5e31a8; background: #fff; box-shadow: 0 8px 20px #36105d35; }
+    .hero #addBookButton { background: #ffdc82; color: #4d2a7d; box-shadow: 0 8px 20px #36105d35; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .stat, .panel, .book {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      box-shadow: 0 9px 24px #42205c0b;
+    }
+
+    .stat { padding: 18px; background: #fff; }
+    .stat:nth-child(1) { background: linear-gradient(145deg, #fff, #f1e9ff); }
+    .stat:nth-child(2) { background: linear-gradient(145deg, #fff, #fff0e9); }
+    .stat:nth-child(3) { background: linear-gradient(145deg, #fff, #e8f8f2); }
+    .stat:nth-child(4) { background: linear-gradient(145deg, #fff, #fff7da); }
+    .stat strong { display: block; color: var(--accent); font-size: 29px; line-height: 1.2; }
+    .stat span { color: var(--muted); font-size: 13px; }
+
+    .tools {
+      display: flex;
+      gap: 10px;
+      margin: 16px 0;
+      flex-wrap: wrap;
+    }
+
+    .tools input, .tools select, .field input, .field select, .field textarea {
+      border: 1px solid #e2d6ec;
+      border-radius: 12px;
+      padding: 11px 12px;
+      color: var(--ink);
+      font: inherit;
+      background: #fff;
+    }
+
+    .tools input { flex: 1; min-width: 190px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 17px;
+    }
+
+    .book {
+      padding: 19px;
+      display: flex;
+      flex-direction: column;
+      min-height: 275px;
+      background: linear-gradient(150deg, #fff 72%, #fcf7ff);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .book:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 30px #59318d20;
+    }
+
+    .bookhead { display: flex; align-items: flex-start; gap: 15px; }
+
+    .cover {
+      width: 76px;
+      height: 106px;
+      border-radius: 8px;
+      background: linear-gradient(145deg, #e5d5ff, #ffd7ce);
+      display: grid;
+      place-items: center;
+      font-size: 30px;
+      flex: none;
+      overflow: hidden;
+      box-shadow: 0 7px 14px #44205c25;
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+
+    .cover img { width: 100%; height: 100%; object-fit: cover; }
+    .book:hover .cover { transform: rotate(-4deg) scale(1.06); box-shadow: 0 11px 20px #44205c38; }
+
+    .book h3 { margin: 0 0 2px; color: #392056; font-size: 17px; line-height: 1.35; }
+    .book p { margin: 7px 0; }
+    .rating { color: #a56a00; font-weight: 750; }
+
+    .bookfoot {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: auto;
+      padding-top: 14px;
+      flex-wrap: wrap;
+    }
+
+    .bookfoot button { padding: 8px 10px; font-size: 13px; }
+    .bookfoot .push { margin-left: auto; }
+
+    .panel { padding: 22px; background: #ffffffec; }
+    .panel h2 { margin: 0 0 14px; color: #542b8f; }
+
+    .section { display: none; }
+    .section.active { display: block; }
+    .section:not(#home) .welcome h1 { color: #542b8f; }
+
+    .two {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .review {
+      border-top: 1px solid var(--line);
+      padding: 14px 0;
+    }
+
+    .review:first-of-type { border-top: 0; }
+
+    .badge {
+      display: inline-block;
+      border-radius: 20px;
+      background: #f0e8ff;
+      color: #6836b4;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 4px 10px;
+    }
+
+    .empty {
+      padding: 30px;
+      text-align: center;
+      color: var(--muted);
+      background: #fff;
+      border: 1px dashed #d4c5e5;
+      border-radius: 18px;
+      grid-column: 1 / -1;
+    }
+
+    dialog {
+      border: 0;
+      border-top: 6px solid var(--accent);
+      border-radius: 19px;
+      box-shadow: 0 18px 60px #26133e55;
+      width: min(480px, calc(100% - 28px));
+      padding: 24px;
+      color: var(--ink);
+    }
+
+    dialog::backdrop { background: #26133e88; backdrop-filter: blur(3px); }
+
+    .field { display: grid; gap: 6px; margin: 12px 0; }
+    .field label { color: #4f326d; font-weight: 700; }
+    .field textarea { min-height: 90px; resize: vertical; }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .notice {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: linear-gradient(120deg, #542b9b, #8c43c3);
+      color: white;
+      padding: 12px 17px;
+      border-radius: 13px;
+      box-shadow: 0 10px 25px #35175a40;
+      display: none;
+      z-index: 4;
+    }
+
+    @media (max-width: 800px) {
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .bar { gap: 10px; }
+      nav { gap: 2px; }
+      .navbtn { padding: 9px 10px; }
+    }
+
+    @media (max-width: 560px) {
+      .bar { flex-wrap: wrap; padding: 12px 16px; }
+      .brand { width: 100%; }
+      nav { width: 100%; overflow: auto; }
+      nav .navbtn { flex: none; }
+      main { margin: 20px auto; padding: 0 16px; }
+      .welcome { align-items: flex-start; flex-direction: column; }
+      .hero { padding: 25px 22px; }
+      .hero::after { right: -5px; top: -15px; font-size: 145px; }
+      .hero-actions { flex-wrap: wrap; }
+      .grid, .two { grid-template-columns: 1fr; }
+      .stats { gap: 9px; }
+      .stat { padding: 14px; }
+      .welcome h1 { font-size: 24px; }
+      .hero h1 { font-size: 34px; }
+      .book { min-height: 250px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; }
+      .book:hover, .book:hover .cover, button:hover { transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="bar">
+      <div class="brand">📚 BOOK <span>HUB</span></div>
+      <nav>
+        <button class="navbtn active" data-page="home">Dashboard</button>
+        <button class="navbtn" data-page="library">Books</button>
+        <button class="navbtn" data-page="reviews">Reviews</button>
+        <button class="navbtn" data-page="reports">Reports</button>
+      </nav>
+      <button class="quiet" id="loginButton">Sign in</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="section active" id="home">
+      <div class="welcome hero">
+        <div>
+          <div class="hero-kicker">A COMMUNITY FOR BOOK LOVERS</div>
+          <h1>Find your next great read</h1>
+          <div class="muted">Discover books recommended by readers like you.</div>
+        </div>
+        <div class="hero-actions">
+          <button class="hero-cta" id="exploreBooksButton" type="button">Explore books →</button>
+          <button id="addBookButton">＋ Add a book</button>
+        </div>
+      </div>
+      <div class="stats" id="stats"></div>
+      <div class="panel">
+        <h2>Recommended for you</h2>
+        <div class="grid" id="featured"></div>
+      </div>
+    </section>
+
+    <section class="section" id="library">
+      <div class="welcome">
+        <div>
+          <h1>Book library</h1>
+          <div class="muted">Browse, search, and manage the catalog.</div>
+        </div>
+        <button id="addBookButton2">＋ Add a book</button>
+      </div>
+      <div class="tools">
+        <input id="search" placeholder="Search title or author…">
+        <select id="genre"><option value="">All genres</option></select>
+        <select id="sort">
+          <option value="title">Title A–Z</option>
+          <option value="rating">Top rated</option>
+          <option value="newest">Recently added</option>
+        </select>
+      </div>
+      <div class="grid" id="books"></div>
+    </section>
+
+    <section class="section" id="reviews">
+      <div class="welcome">
+        <div>
+          <h1>Reader reviews</h1>
+          <div class="muted">What the community is reading and enjoying.</div>
+        </div>
+      </div>
+      <div class="panel" id="reviewList"></div>
+    </section>
+
+    <section class="section" id="reports">
+      <div class="welcome">
+        <div>
+          <h1>Community reports</h1>
+          <div class="muted">A quick snapshot of the book community.</div>
+        </div>
+      </div>
+      <div class="two">
+        <div class="panel">
+          <h2>Library overview</h2>
+          <div id="reportBooks"></div>
+        </div>
+        <div class="panel">
+          <h2>Popular books</h2>
+          <div id="popular"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="bookDialog">
+    <form id="bookForm">
+      <h2 id="bookDialogTitle">Add a book</h2>
+      <input type="hidden" id="bookId">
+      <div class="field"><label for="title">Title</label><input id="title" required maxlength="100"></div>
+      <div class="field"><label for="author">Author</label><input id="author" required maxlength="80"></div>
+      <div class="field"><label for="bookGenre">Genre</label><input id="bookGenre" required maxlength="40" placeholder="e.g. Fantasy"></div>
+      <div class="field"><label for="description">Short description</label><textarea id="description" maxlength="300"></textarea></div>
+      <div class="field"><label for="cover">Cover image URL (optional)</label><input id="cover" type="url" placeholder="https://example.com/cover.jpg"></div>
+      <div class="actions">
+        <button type="button" class="quiet" data-close="bookDialog">Cancel</button>
+        <button>Save book</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="reviewDialog">
+    <form id="reviewForm">
+      <h2>Write a review</h2>
+      <input type="hidden" id="reviewBookId">
+      <div class="field"><label for="reviewer">Your name</label><input id="reviewer" required maxlength="50" placeholder="Reader name"></div>
+      <div class="field">
+        <label for="stars">Rating</label>
+        <select id="stars">
+          <option value="5">★★★★★ — Loved it</option>
+          <option value="4">★★★★ — Really good</option>
+          <option value="3">★★★ — It was okay</option>
+          <option value="2">★★ — Not for me</option>
+          <option value="1">★ — Disappointing</option>
+        </select>
+      </div>
+      <div class="field"><label for="reviewText">Your review</label><textarea id="reviewText" required maxlength="500" placeholder="What did you think?"></textarea></div>
+      <div class="actions">
+        <button type="button" class="quiet" data-close="reviewDialog">Cancel</button>
+        <button>Post review</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="loginDialog">
+    <form id="loginForm">
+      <h2>Welcome to BOOK HUB</h2>
+      <p class="muted">Choose a display name and role for this demo.</p>
+      <div class="field"><label for="userName">Name</label><input id="userName" required maxlength="50" placeholder="Your name"></div>
+      <div class="field">
+        <label for="role">Role</label>
+        <select id="role">
+          <option value="reader">Reader</option>
+          <option value="admin">Admin (manage catalog)</option>
+        </select>
+      </div>
+      <div class="actions">
+        <button type="button" class="quiet" data-close="loginDialog">Cancel</button>
+        <button>Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="notice" id="notice" role="status"></div>
+
+  <script>
+    const starterBooks = [
+      {
+        id: "b1",
+        title: "The Midnight Library",
+        author: "Matt Haig",
+        genre: "Fiction",
+        cover: "https://covers.openlibrary.org/b/isbn/9780525559474-M.jpg?default=false",
+        description: "Between life and death there is a library, and within that library, the shelves go on forever.",
+        reviews: [
+          { name: "Asha", rating: 5, text: "A moving story that made me think about all the paths a life can take." }
+        ]
+      },
+      {
+        id: "b2",
+        title: "Project Hail Mary",
+        author: "Andy Weir",
+        genre: "Science Fiction",
+        cover: "https://covers.openlibrary.org/b/isbn/9780593135204-M.jpg?default=false",
+        description: "A lone astronaut must solve an impossible scientific mystery to save humanity.",
+        reviews: [
+          { name: "Noah", rating: 5, text: "Clever, funny, and impossible to put down." },
+          { name: "Mira", rating: 4, text: "A wonderful space adventure." }
+        ]
+      },
+      {
+        id: "b3",
+        title: "The Very Secret Society of Irregular Witches",
+        author: "Sangu Mandanna",
+        genre: "Fantasy",
+        cover: "https://covers.openlibrary.org/b/isbn/9780593439357-M.jpg?default=false",
+        description: "A lonely witch finds a home, a family, and a little magic in an unexpected place.",
+        reviews: [
+          { name: "Dev", rating: 4, text: "Warm and charming, like a cup of tea on a rainy day." }
+        ]
+      },
+      {
+        id: "b4",
+        title: "Educated",
+        author: "Tara Westover",
+        genre: "Memoir",
+        cover: "https://covers.openlibrary.org/b/isbn/9780399590504-M.jpg?default=false",
+        description: "A memoir about family, learning, and finding a place in the world.",
+        reviews: []
+      },
+      {
+        id: "b5",
+        title: "Pachinko",
+        author: "Min Jin Lee",
+        genre: "Historical Fiction",
+        cover: "https://covers.openlibrary.org/b/isbn/9781455563937-M.jpg?default=false",
+        description: "A sweeping family story spanning generations and continents.",
+        reviews: [
+          { name: "Asha", rating: 5, text: "Beautifully written and deeply absorbing." }
+        ]
+      },
+      {
+        id: "b6",
+        title: "Atomic Habits",
+        author: "James Clear",
+        genre: "Self-help",
+        cover: "https://covers.openlibrary.org/b/isbn/9780735211292-M.jpg?default=false",
+        description: "Practical ideas for building good habits and making small changes stick.",
+        reviews: []
+      }
+    ];
+
+    // Use saved books when available; otherwise start with the sample books.
+    let books = JSON.parse(localStorage.getItem("bookhub_books") || "null") || starterBooks;
+    let user = JSON.parse(localStorage.getItem("bookhub_user") || "null");
+
+    const getElement = id => document.getElementById(id);
+    const averageRating = book => book.reviews.length
+      ? book.reviews.reduce((total, review) => total + Number(review.rating), 0) / book.reviews.length
+      : 0;
+
+    function saveBooks() {
+      localStorage.setItem("bookhub_books", JSON.stringify(books));
+      render();
+    }
+
+    // Escape text before placing it inside generated HTML.
+    function escapeHTML(text = "") {
+      return String(text).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+      }[character]));
+    }
+
+    function toast(message) {
+      const notice = getElement("notice");
+      notice.textContent = message;
+      notice.style.display = "block";
+      setTimeout(() => notice.style.display = "none", 2500);
+    }
+
+    function card(book) {
+      const rating = averageRating(book);
+      const cover = book.cover || starterBooks.find(item => item.id === book.id)?.cover;
+
+      return `
+        <article class="book">
+          <div class="bookhead">
+            <div class="cover">${cover
+              ? `<img src="${escapeHTML(cover)}" alt="Cover of ${escapeHTML(book.title)}" onerror="this.parentElement.textContent='📖'">`
+              : "📖"}</div>
+            <div>
+              <h3>${escapeHTML(book.title)}</h3>
+              <p class="muted">by ${escapeHTML(book.author)}</p>
+              <span class="badge">${escapeHTML(book.genre)}</span>
+            </div>
+          </div>
+          <p>${escapeHTML(book.description || "")}</p>
+          <p class="rating">
+            ${rating
+              ? `★ ${rating.toFixed(1)} · ${book.reviews.length} review${book.reviews.length === 1 ? "" : "s"}`
+              : "☆ No reviews yet"}
+          </p>
+          <div class="bookfoot">
+            <button class="quiet" onclick="openReview('${book.id}')">Review</button>
+            <button class="quiet" onclick="recommend('${book.id}')">Recommend</button>
+            ${user?.role === "admin"
+              ? `<button class="quiet push" onclick="editBook('${book.id}')">Edit</button>
+                 <button class="danger" onclick="deleteBook('${book.id}')">Delete</button>`
+              : ""}
+          </div>
+        </article>
+      `;
+    }
+
+    function render() {
+      const allReviews = books.flatMap(book =>
+        book.reviews.map(review => ({ ...review, title: book.title }))
+      );
+      const reviewCount = allReviews.length;
+      const genres = [...new Set(books.map(book => book.genre))].sort();
+
+      getElement("stats").innerHTML = `
+        <div class="stat"><strong>${books.length}</strong><span>Books in library</span></div>
+        <div class="stat"><strong>${reviewCount}</strong><span>Reader reviews</span></div>
+        <div class="stat"><strong>${genres.length}</strong><span>Genres to explore</span></div>
+        <div class="stat"><strong>${books.filter(book => averageRating(book) >= 4).length}</strong><span>Reader favorites</span></div>
+      `;
+
+      getElement("featured").innerHTML = [...books]
+        .sort((a, b) => averageRating(b) - averageRating(a))
+        .slice(0, 3)
+        .map(card)
+        .join("") || '<div class="empty">No books yet. Add one to get started.</div>';
+
+      const query = getElement("search").value.toLowerCase();
+      const selectedGenre = getElement("genre").value;
+      const sort = getElement("sort").value;
+
+      let list = books.filter(book =>
+        (!query || (book.title + " " + book.author).toLowerCase().includes(query)) &&
+        (!selectedGenre || book.genre === selectedGenre)
+      );
+
+      if (sort === "rating") list.sort((a, b) => averageRating(b) - averageRating(a));
+      else if (sort === "newest") list.reverse();
+      else list.sort((a, b) => a.title.localeCompare(b.title));
+
+      getElement("books").innerHTML = list.map(card).join("") ||
+        '<div class="empty">No matching books. Try another search.</div>';
+
+      const oldGenre = getElement("genre").value;
+      getElement("genre").innerHTML = '<option value="">All genres</option>' +
+        genres.map(genre => `<option>${escapeHTML(genre)}</option>`).join("");
+      getElement("genre").value = genres.includes(oldGenre) ? oldGenre : "";
+
+      getElement("reviewList").innerHTML = allReviews.length
+        ? allReviews.slice().reverse().map(review => `
+            <div class="review">
+              <strong>${escapeHTML(review.name)}</strong> reviewed
+              <b>${escapeHTML(review.title)}</b>
+              <span class="rating">${"★".repeat(review.rating)}${"☆".repeat(5 - review.rating)}</span>
+              <p>${escapeHTML(review.text)}</p>
+            </div>
+          `).join("")
+        : '<p class="muted">No reviews yet. Open a book and write the first one.</p>';
+
+      const communityAverage = reviewCount
+        ? (allReviews.reduce((total, review) => total + Number(review.rating), 0) / reviewCount).toFixed(1)
+        : "—";
+
+      getElement("reportBooks").innerHTML = `
+        <p><b>${books.length}</b> books across <b>${genres.length}</b> genres.</p>
+        <p><b>${reviewCount}</b> reviews from <b>${new Set(allReviews.map(review => review.name)).size}</b> readers.</p>
+        <p>Average community rating: <b>${communityAverage}</b></p>
+      `;
+
+      getElement("popular").innerHTML = [...books]
+        .sort((a, b) => b.reviews.length - a.reviews.length || averageRating(b) - averageRating(a))
+        .slice(0, 5)
+        .map(book => `<p>📘 <b>${escapeHTML(book.title)}</b> <span class="muted">· ${book.reviews.length} reviews</span></p>`)
+        .join("") || "No books yet.";
+
+      getElement("loginButton").textContent = user
+        ? `${user.name} · ${user.role} (sign out)`
+        : "Sign in";
+
+      const addBookDisplay = user?.role === "admin" ? "inline-block" : "none";
+      getElement("addBookButton").style.display = addBookDisplay;
+      getElement("addBookButton2").style.display = addBookDisplay;
+    }
+
+    function openReview(id) {
+      getElement("reviewForm").reset();
+      getElement("reviewBookId").value = id;
+      if (user) getElement("reviewer").value = user.name;
+      getElement("reviewDialog").showModal();
+    }
+
+    function editBook(id) {
+      const book = books.find(item => item.id === id);
+      if (!book) return;
+
+      getElement("bookDialogTitle").textContent = "Edit book";
+      getElement("bookId").value = book.id;
+      getElement("title").value = book.title;
+      getElement("author").value = book.author;
+      getElement("bookGenre").value = book.genre;
+      getElement("description").value = book.description || "";
+      getElement("cover").value = book.cover || starterBooks.find(item => item.id === book.id)?.cover || "";
+      getElement("bookDialog").showModal();
+    }
+
+    function deleteBook(id) {
+      if (!confirm("Delete this book and its reviews?")) return;
+      books = books.filter(book => book.id !== id);
+      saveBooks();
+      toast("Book deleted");
+    }
+
+    function recommend(id) {
+      const book = books.find(item => item.id === id);
+      const message = `I recommend ${book.title} by ${book.author}!`;
+
+      if (navigator.share) {
+        navigator.share({ title: `I recommend ${book.title}`, text: message }).catch(() => {});
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(message).then(() => toast("Recommendation copied"));
+      } else {
+        toast(message);
+      }
+    }
+
+    function addBook() {
+      if (user?.role !== "admin") {
+        toast("Sign in as an admin to manage books");
+        return;
+      }
+
+      getElement("bookDialogTitle").textContent = "Add a book";
+      getElement("bookForm").reset();
+      getElement("bookId").value = "";
+      getElement("bookDialog").showModal();
+    }
+
+    document.querySelectorAll(".navbtn").forEach(button => {
+      button.onclick = () => {
+        document.querySelectorAll(".navbtn").forEach(item => item.classList.remove("active"));
+        button.classList.add("active");
+        document.querySelectorAll(".section").forEach(section => section.classList.remove("active"));
+        getElement(button.dataset.page).classList.add("active");
+      };
+    });
+
+    getElement("search").oninput = render;
+    getElement("genre").onchange = render;
+    getElement("sort").onchange = render;
+    getElement("addBookButton").onclick = getElement("addBookButton2").onclick = addBook;
+    getElement("exploreBooksButton").onclick = () =>
+      document.querySelector('.navbtn[data-page="library"]').click();
+
+    getElement("loginButton").onclick = () => {
+      if (user) {
+        user = null;
+        localStorage.removeItem("bookhub_user");
+        render();
+        toast("Signed out");
+      } else {
+        getElement("loginDialog").showModal();
+      }
+    };
+
+    getElement("loginForm").onsubmit = event => {
+      event.preventDefault();
+      user = {
+        name: getElement("userName").value.trim(),
+        role: getElement("role").value
+      };
+      localStorage.setItem("bookhub_user", JSON.stringify(user));
+      getElement("loginDialog").close();
+      render();
+      toast(`Welcome, ${user.name}!`);
+    };
+
+    getElement("bookForm").onsubmit = event => {
+      event.preventDefault();
+
+      const id = getElement("bookId").value;
+      const book = {
+        id: id || crypto.randomUUID(),
+        title: getElement("title").value.trim(),
+        author: getElement("author").value.trim(),
+        genre: getElement("bookGenre").value.trim(),
+        description: getElement("description").value.trim(),
+        cover: getElement("cover").value.trim(),
+        reviews: []
+      };
+
+      if (id) {
+        const oldBook = books.find(item => item.id === id);
+        book.reviews = oldBook.reviews;
+        books = books.map(item => item.id === id ? book : item);
+      } else {
+        books.push(book);
+      }
+
+      getElement("bookDialog").close();
+      saveBooks();
+      toast(id ? "Book updated" : "Book added");
+    };
+
+    getElement("reviewForm").onsubmit = event => {
+      event.preventDefault();
+
+      const book = books.find(item => item.id === getElement("reviewBookId").value);
+      if (!book) return;
+
+      book.reviews.push({
+        name: getElement("reviewer").value.trim(),
+        rating: Number(getElement("stars").value),
+        text: getElement("reviewText").value.trim()
+      });
+
+      getElement("reviewDialog").close();
+      saveBooks();
+      toast("Thanks! Your review was posted.");
+    };
+
+    document.querySelectorAll("[data-close]").forEach(button => {
+      button.onclick = () => getElement(button.dataset.close).close();
+    });
+
+    render();
+  </script>
+</body>
+</html>
